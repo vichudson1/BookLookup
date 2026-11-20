@@ -8,28 +8,31 @@
 import SwiftUI
 
 struct ContentView: View {
-    var body: some View {
-        Text("Loading Books")
-            .task {
-                guard let baseURL = URL(string: "https://openlibrary.org/search.json") else {
-                    return
-                }
-                let url = baseURL.appending(queryItems: [
-                    URLQueryItem(name: "q", value: "dune"),
-                    URLQueryItem(name: "limit", value: "5"),
-                ])
+    @State private var books: [BookResult] = []
+    @State private var searchTerm: String = "Dune"
 
-                do {
-                    let (data, _) = try await URLSession.shared.data(from: url)
-                    let response = try JSONDecoder().decode(SearchResponse.self, from: data)
-                    for book in response.docs {
-                        print(book.title)
-                        print(book.authorNames ?? "No Authors")
+    var body: some View {
+        List {
+            Section("Search Term") {
+                TextField("Search Term", text: $searchTerm)
+            }
+            Section("Results") {
+                ForEach(books) { book in
+                    VStack(alignment: .leading) {
+                        Text(book.title)
+                        Text(book.authorNames?.joined(separator: ", ") ?? "")
+                            .foregroundStyle(.secondary)
                     }
-                } catch {
-                    print("Fetch failed: \(error)")
                 }
             }
+        }
+        .task(id: searchTerm) {
+            do {
+                books = try await OpenLibraryClient().searchBooks(matching: searchTerm)
+            } catch {
+                print("Fetch failed: \(error)")
+            }
+        }
     }
 }
 
