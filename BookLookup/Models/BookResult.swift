@@ -19,7 +19,7 @@ struct BookResult: Decodable, Identifiable {
     var id: String { key }
 
     // MARK: - Coding Keys
-    enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey, CaseIterable {
         case key
         case title
         case authorNames = "author_name"
