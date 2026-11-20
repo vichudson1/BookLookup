@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  SearchView.swift
 //  BookLookup
 //
 //  Created by Victor Hudson on 11/18/26.
@@ -7,17 +7,18 @@
 
 import SwiftUI
 
-struct ContentView: View {
-    @State private var books: [BookResult] = []
-    @State private var searchTerm: String = "Dune"
+struct SearchView: View {
+    // MARK: - @State properties
+    @State private var model = SearchViewModel()
 
+    // MARK: - View Body
     var body: some View {
         List {
             Section("Search Term") {
-                TextField("Search Term", text: $searchTerm)
+                TextField("Search Term", text: $model.searchTerm)
             }
             Section("Results") {
-                ForEach(books) { book in
+                ForEach(model.books) { book in
                     VStack(alignment: .leading) {
                         Text(book.title)
                         Text(book.authorNames?.joined(separator: ", ") ?? "")
@@ -26,16 +27,12 @@ struct ContentView: View {
                 }
             }
         }
-        .task(id: searchTerm) {
-            do {
-                books = try await OpenLibraryClient().searchBooks(matching: searchTerm)
-            } catch {
-                print("Fetch failed: \(error)")
-            }
+        .task(id: model.searchTerm) {
+            await model.search()
         }
     }
 }
 
 #Preview {
-    ContentView()
+    SearchView()
 }
