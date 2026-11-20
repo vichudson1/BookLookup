@@ -16,11 +16,11 @@ struct OpenLibraryClient {
     ///
     /// - Parameters:
     ///   - query: The text to search for, such as a title or an author.
-    ///   - limit: The most results to return. Defaults to `5`.
+    ///   - limit: The most results to return. The search may return fewer.
     /// - Returns: The matching books, or an empty array if `query` is blank.
     /// - Throws: A `URLError` if the request fails, or a `DecodingError` if
     ///   the response doesn't match ``BookResult``.
-    func searchBooks(matching query: String, limit: Int = 5) async throws -> [BookResult] {
+    func searchBooks(matching query: String, limit: Int) async throws -> [BookResult] {
         guard let baseURL = URL(string: "https://openlibrary.org/search.json") else {
             throw URLError(.badURL)
         }

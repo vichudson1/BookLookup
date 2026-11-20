@@ -15,7 +15,7 @@ struct SearchView: View {
     var body: some View {
         List {
             Section("Search Term") {
-                TextField("Search Term", text: $model.searchTerm)
+                TextField("Search Term", text: $model.query.searchTerm)
             }
             Section("Results") {
                 ForEach(model.books) { book in
@@ -27,7 +27,7 @@ struct SearchView: View {
                 }
             }
         }
-        .task(id: model.searchTerm) {
+        .task(id: model.query) {
             await model.search()
         }
     }

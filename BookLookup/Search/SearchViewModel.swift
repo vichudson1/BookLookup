@@ -11,7 +11,7 @@ import Foundation
 @Observable
 final class SearchViewModel {
     // MARK: - Properties
-    var searchTerm = ""
+    var query = SearchQuery()
     var books: [BookResult] = []
     var errorMessage: String?
 
@@ -21,7 +21,7 @@ final class SearchViewModel {
     // MARK: - Methods
     func search() async {
         do {
-            books = try await client.searchBooks(matching: searchTerm)
+            books = try await client.searchBooks(matching: query.searchTerm, limit: query.limit)
             errorMessage = nil
         } catch {
             errorMessage = error.localizedDescription
