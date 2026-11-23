@@ -13,33 +13,33 @@ struct SearchView: View {
 
     // MARK: - View Body
     var body: some View {
-        List {
-            Section("Search Term") {
-                TextField("Search Term", text: $model.query.searchTerm)
-            }
+        NavigationStack {
+            List {
+                Section("Number of Results") {
+                    Picker("Result Limit", selection: $model.query.limit) {
+                        ForEach(SearchQuery.limitOptions, id: \.self) { limit in
+                            Text(limit, format: .number)
+                                .tag(limit)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
 
-            Section("Number of Results") {
-                Picker("Result Limit", selection: $model.query.limit) {
-                    ForEach(SearchQuery.limitOptions, id: \.self) { limit in
-                        Text(limit, format: .number)
-                            .tag(limit)
+                Section("Results") {
+                    ForEach(model.books) { book in
+                        VStack(alignment: .leading) {
+                            Text(book.title)
+                            Text(book.authorNames?.joined(separator: ", ") ?? "")
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
-                .pickerStyle(.segmented)
             }
-
-            Section("Results") {
-                ForEach(model.books) { book in
-                    VStack(alignment: .leading) {
-                        Text(book.title)
-                        Text(book.authorNames?.joined(separator: ", ") ?? "")
-                            .foregroundStyle(.secondary)
-                    }
-                }
+            .navigationTitle("Book Lookup")
+            .searchable(text: $model.query.searchTerm, prompt: "Title or author.")
+            .task(id: model.query) {
+                await model.search()
             }
-        }
-        .task(id: model.query) {
-            await model.search()
         }
     }
 }
