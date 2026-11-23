@@ -18,8 +18,8 @@ struct OpenLibraryClient {
     ///   - query: The text to search for, such as a title or an author.
     ///   - limit: The most results to return. The search may return fewer.
     /// - Returns: The matching books, or an empty array if `query` is blank.
-    /// - Throws: A `URLError` if the request fails, or a `DecodingError` if
-    ///   the response doesn't match ``BookResult``.
+    /// - Throws: A `URLError` if the request fails or the server returns an error status,
+    ///   or a `DecodingError` if the response doesn't match ``BookResult``.
     func searchBooks(matching query: String, limit: Int) async throws -> [BookResult] {
         guard let baseURL = URL(string: "https://openlibrary.org/search.json") else {
             throw URLError(.badURL)
@@ -38,10 +38,15 @@ struct OpenLibraryClient {
         var request = URLRequest(url: url)
         request.setValue("BookLookup/1.0 (vichudson1@gmail.com)", forHTTPHeaderField: "User-Agent")
 
-        let (data, _) = try await URLSession.shared.data(for: request)
-        let response = try JSONDecoder().decode(SearchResponse.self, from: data)
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse,
+            (200...299).contains(httpResponse.statusCode)
+        else {
+            throw URLError(.badServerResponse)
+        }
 
-        return response.docs
+        let searchResponse = try JSONDecoder().decode(SearchResponse.self, from: data)
+
+        return searchResponse.docs
     }
 }
-
