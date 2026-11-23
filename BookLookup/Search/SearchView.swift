@@ -17,6 +17,17 @@ struct SearchView: View {
             Section("Search Term") {
                 TextField("Search Term", text: $model.query.searchTerm)
             }
+
+            Section("Number of Results") {
+                Picker("Result Limit", selection: $model.query.limit) {
+                    ForEach(SearchQuery.limitOptions, id: \.self) { limit in
+                        Text(limit, format: .number)
+                            .tag(limit)
+                    }
+                }
+                .pickerStyle(.segmented)
+            }
+
             Section("Results") {
                 ForEach(model.books) { book in
                     VStack(alignment: .leading) {
