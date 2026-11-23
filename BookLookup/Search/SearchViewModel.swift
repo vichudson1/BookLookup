@@ -17,15 +17,26 @@ final class SearchViewModel {
 
     // MARK: - Private Properties
     private let client = OpenLibraryClient()
+    private let delay: Duration
+
+    // MARK: - Init
+    init(delay: Duration = .milliseconds(400)) {
+        self.delay = delay
+    }
 
     // MARK: - Methods
     func search() async {
         do {
+            try await Task.sleep(for: delay)
             books = try await client.searchBooks(
                 matching: query.searchTerm,
                 limit: query.limit
             )
             errorMessage = nil
+        } catch is CancellationError {
+            // Query was changed
+        } catch let error as URLError where error.code == .cancelled {
+            // Request cancelled by new query
         } catch {
             errorMessage = error.localizedDescription
             print("Fetch failed: \(error)")
