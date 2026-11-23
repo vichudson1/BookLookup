@@ -39,6 +39,7 @@ final class SearchViewModel {
             // Request cancelled by new query
         } catch {
             errorMessage = error.localizedDescription
+            books = []
             print("Fetch failed: \(error)")
         }
     }

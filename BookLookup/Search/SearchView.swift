@@ -36,7 +36,21 @@ struct SearchView: View {
                 }
             }
             .navigationTitle("Book Lookup")
-            .searchable(text: $model.query.searchTerm, prompt: "Title or author.")
+            .searchable(text: $model.query.searchTerm, prompt: "Title or author")
+            .overlay {
+                if let errorMessage = model.errorMessage {
+                    ContentUnavailableView {
+                        Label(
+                            "Couldn't Load Results", systemImage: "exclamationmark.magnifyingglass"
+                        )
+                        .symbolEffect(
+                            .pulse.wholeSymbol,
+                            options: .repeat(.periodic(3, delay: 1.0)))
+                    } description: {
+                        Text(errorMessage)
+                    }
+                }
+            }
             .task(id: model.query) {
                 await model.search()
             }
