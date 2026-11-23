@@ -5,8 +5,8 @@
 //  Created by Victor Hudson on 11/20/26.
 //
 
-import Observation
 import Foundation
+import Observation
 
 @Observable
 final class SearchViewModel {
@@ -21,7 +21,10 @@ final class SearchViewModel {
     // MARK: - Methods
     func search() async {
         do {
-            books = try await client.searchBooks(matching: query.searchTerm, limit: query.limit)
+            books = try await client.searchBooks(
+                matching: query.searchTerm,
+                limit: query.limit
+            )
             errorMessage = nil
         } catch {
             errorMessage = error.localizedDescription
