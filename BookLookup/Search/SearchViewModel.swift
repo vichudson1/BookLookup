@@ -13,7 +13,7 @@ final class SearchViewModel {
     // MARK: - Properties
     var query = SearchQuery()
     var books: [BookResult] = []
-    var errorMessage: String?
+    var searchState: SearchState = .idle
 
     // MARK: - Private Properties
     private let client = OpenLibraryClient()
@@ -27,20 +27,26 @@ final class SearchViewModel {
     // MARK: - Methods
     func search() async {
         do {
+            books = []
+            searchState = .loading
             try await Task.sleep(for: delay)
             books = try await client.searchBooks(
                 matching: query.searchTerm,
                 limit: query.limit
             )
-            errorMessage = nil
+            if query.searchTerm.isBlank {
+                searchState = .idle
+            } else if books.isEmpty {
+                searchState = .noResults(term: query.searchTerm)
+            } else {
+                searchState = .results
+            }
         } catch is CancellationError {
             // Query was changed
         } catch let error as URLError where error.code == .cancelled {
             // Request cancelled by new query
         } catch {
-            errorMessage = error.localizedDescription
-            books = []
-            print("Fetch failed: \(error)")
+            searchState = .failed(error: error)
         }
     }
 }

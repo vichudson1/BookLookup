@@ -6,7 +6,8 @@
 //
 
 enum SystemImage: String {
-    case search = "sparkle.magnifyingglass"
+    case idle = "sparkle.magnifyingglass"
     case error = "exclamationmark.magnifyingglass"
     case emptySearch = "minus.magnifyingglass"
+    case loading = "books.vertical.fill"
 }

@@ -9,26 +9,27 @@ import SwiftUI
 
 struct PulsingUnavailableView: View {
     // MARK: - Properties
-    let title: String
-    let systemImage: SystemImage
-    let description: String
+    let configuration: OverlayViewConfiguration
 
     // MARK: - View
     var body: some View {
         ContentUnavailableView {
-            Label(title, systemImage: systemImage.rawValue)
+            Label(configuration.title, systemImage: configuration.systemImage.rawValue)
                 .symbolEffect(
                     .pulse.wholeSymbol,
                     options: .repeat(.periodic(3, delay: 1.0)))
         } description: {
-            Text(description)
+            Text(configuration.description)
         }
     }
 }
 
 #Preview {
     PulsingUnavailableView(
-        title: "Sample",
-        systemImage: .search,
-        description: "Description")
+        configuration: OverlayViewConfiguration(
+            title: "Sample",
+            systemImage: .idle,
+            description: "Description"
+        )
+    )
 }

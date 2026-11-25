@@ -38,21 +38,8 @@ struct SearchView: View {
             .navigationTitle("Book Lookup")
             .searchable(text: $model.query.searchTerm, prompt: "Title or author")
             .overlay {
-                if let errorMessage = model.errorMessage {
-                    PulsingUnavailableView(
-                        title: "Couldn't Load Results",
-                        systemImage: .error,
-                        description: errorMessage)
-                } else if model.query.searchTerm.isBlank {
-                    PulsingUnavailableView(
-                        title: "Search For Books",
-                        systemImage: .search,
-                        description: "Search for books by title or author.")
-                } else if model.books.isEmpty {
-                    PulsingUnavailableView(
-                        title: "No Matches Found",
-                        systemImage: .emptySearch,
-                        description: "No books match \"\(model.query.searchTerm)\"")
+                if let configuration = model.searchState.overlayConfiguration {
+                    PulsingUnavailableView(configuration: configuration)
                 }
             }
             .task(id: model.query) {
